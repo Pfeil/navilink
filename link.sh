@@ -30,7 +30,8 @@ then
     curl -X PUT "$URL" -d "$body"
 elif equals $COMMAND "pull"
 then
-    curl -X POST $URL -d "$PASSPHRASE"
+body='"'$PASSPHRASE'"'
+    curl -X POST $URL -d "$body"
 else
     echo "Valid commands are:" push pull
 fi

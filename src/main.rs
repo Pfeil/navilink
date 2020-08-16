@@ -47,12 +47,12 @@ fn push(id: String, record: Json<Record>, state: State<Mutex<Memory>>) -> Answer
 #[post("/<id>", data = "<passphrase>")]
 fn pull(
     id: String,
-    passphrase: String,
+    passphrase: Json<String>,
     state: State<Mutex<Memory>>,
 ) -> Result<Plain<String>, Status> {
     let guard = state.lock().unwrap();
     if let Some(stored_record) = guard.ids.get(&id) {
-        if passphrase == stored_record.passphrase {
+        if passphrase.into_inner() == stored_record.passphrase {
             Ok(Plain(stored_record.item.to_string()))
         } else {
             Err(Status::Unauthorized)
