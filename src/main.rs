@@ -3,7 +3,7 @@ use ::std::collections::HashMap;
 use ::std::sync::Mutex;
 use rocket::http::Status;
 use rocket::response::{content::Plain, status};
-use rocket::State;
+use rocket::{Request, State};
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
 
@@ -62,9 +62,15 @@ fn pull(
     }
 }
 
+#[catch(400)]
+fn bad_request(req: &Request) -> String {
+    format!("{:?}", req)
+}
+
 fn main() {
     rocket::ignite()
         .manage(Mutex::new(Memory::default()))
         .mount("/v1", routes![push, pull])
+        .register(catchers![bad_request])
         .launch();
 }
