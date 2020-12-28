@@ -83,13 +83,20 @@ impl Fairing for Logger {
     }
 
     fn on_request(&self, request: &mut Request, data: &rocket::Data) {
+        println!("Logger: {:?}", request);
+        let mut data_content: Vec<u8> = Vec::new();
+        while !data.peek_complete() {
+            let peek = data.peek();
+            for byte in peek {
+                data_content.push(*byte);
+            }
+        }
         println!(
-            "Logger: {:?} {:?} with data {:?}",
+            "Logger: {:?} {:?} with data {:#?}",
             request.method(),
             request.uri().path(),
             std::str::from_utf8(data.peek())
         );
-        println!("Logger: {:?}", request);
     }
 
     //fn on_response(&self, request: &Request, response: &mut rocket::Response) {}
