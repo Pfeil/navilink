@@ -63,14 +63,19 @@ fn pull(
 }
 
 #[catch(400)]
-fn bad_request(req: &Request) -> String {
-    format!("{:?}", req)
+fn bad_request_400(req: &Request) -> String {
+    format!("HTTP 400: {:?}", req)
+}
+
+#[catch(404)]
+fn bad_request_404(req: &Request) -> String {
+    format!("HTTP 404: {:?}", req)
 }
 
 fn main() {
     rocket::ignite()
         .manage(Mutex::new(Memory::default()))
         .mount("/v1", routes![push, pull])
-        .register(catchers![bad_request])
+        .register(catchers![bad_request_400, bad_request_404])
         .launch();
 }
