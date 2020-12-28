@@ -1,8 +1,12 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 use ::std::collections::HashMap;
+use ::std::convert::TryFrom;
 use ::std::sync::Mutex;
-use rocket::{fairing::{Fairing, Info, Kind}, http::Status};
 use rocket::response::{content::Plain, status};
+use rocket::{
+    fairing::{Fairing, Info, Kind},
+    http::Status,
+};
 use rocket::{Request, State};
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
@@ -62,16 +66,6 @@ fn pull(
     }
 }
 
-#[catch(400)]
-fn bad_request_400(req: &Request) -> String {
-    format!("HTTP 400: {:?}", req)
-}
-
-#[catch(404)]
-fn bad_request_404(req: &Request) -> String {
-    format!("HTTP 404: {:?}", req)
-}
-
 struct Logger;
 
 impl Logger {
@@ -84,7 +78,7 @@ impl Fairing for Logger {
     fn info(&self) -> rocket::fairing::Info {
         Info {
             name: "Error Logger",
-            kind: Kind::Request | Kind::Response
+            kind: Kind::Request | Kind::Response,
         }
     }
 
@@ -92,9 +86,10 @@ impl Fairing for Logger {
         println!(
             "Logger: {:?} {:?} with data {:?}",
             request.method(),
-            request.route(),
-            data.peek()
+            request.uri().path(),
+            std::str::from_utf8(data.peek())
         );
+        println!("Logger: {:?}", request);
     }
 
     //fn on_response(&self, request: &Request, response: &mut rocket::Response) {}
