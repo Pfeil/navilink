@@ -8,7 +8,9 @@ LOCAL_FOLDER=shared
 mkdir -p $LOCAL_FOLDER
 
 docker run --name=$CONTAINER_NAME -v $(pwd)/$LOCAL_FOLDER:/navilink/target/release $IMAGE_NAME
-sleep 5s
+sleep 10s
 echo "CONTAINER ENDED. DELETE IT"
 docker stop $CONTAINER_ID
-docker container rm $CONTAINER_NAME
+#docker container rm $CONTAINER_NAME
+docker rmi -f $(docker images -q --filter label=stage=outdated)
+docker image rm $IMAGE_NAME
