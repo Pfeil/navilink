@@ -9,6 +9,7 @@ ITEM_TO_STORE=$HOSTNAME
 
 URL="$BASE_URL/$IDENTIFIER"
 COMMAND=$1
+HEADER="Content-Type:application/json"
 
 function exitErr {
     echo "ERROR -> EXITING." $@
@@ -27,11 +28,11 @@ function assertCommandIs {
 if equals $COMMAND "push"
 then
     body='{"passphrase": "'$PASSPHRASE'", "item": "'$ITEM_TO_STORE'"}'
-    curl -L -X PUT "$URL" -d "$body"
+    curl -L --post301 -X PUT -d "$body" -H $HEADER "$URL"
 elif equals $COMMAND "pull"
 then
 body='"'$PASSPHRASE'"'
-    curl -L -X POST $URL -d "$body"
+    curl -L --post301 -X POST -d "$body" -H $HEADER "$URL"
 else
     echo "Valid commands are:" push pull
 fi

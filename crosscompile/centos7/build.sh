@@ -11,6 +11,6 @@ docker run --name=$CONTAINER_NAME -v $(pwd)/$LOCAL_FOLDER:/navilink/target/relea
 sleep 10s
 echo "CONTAINER ENDED. DELETE IT"
 docker stop $CONTAINER_ID
-#docker container rm $CONTAINER_NAME
+docker container rm $CONTAINER_NAME
 docker rmi -f $(docker images -q --filter label=stage=outdated)
 docker image rm $IMAGE_NAME
