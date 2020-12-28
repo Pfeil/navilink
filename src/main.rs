@@ -1,7 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 use ::std::collections::HashMap;
 use ::std::sync::Mutex;
-use rocket::http::Status;
+use rocket::{fairing::{Fairing, Info, Kind}, http::Status};
 use rocket::response::{content::Plain, status};
 use rocket::{Request, State};
 use rocket_contrib::json::Json;
@@ -72,10 +72,38 @@ fn bad_request_404(req: &Request) -> String {
     format!("HTTP 404: {:?}", req)
 }
 
+struct Logger;
+
+impl Logger {
+    pub fn new() -> Self {
+        Logger
+    }
+}
+
+impl Fairing for Logger {
+    fn info(&self) -> rocket::fairing::Info {
+        Info {
+            name: "Error Logger",
+            kind: Kind::Request | Kind::Response
+        }
+    }
+
+    fn on_request(&self, request: &mut Request, data: &rocket::Data) {
+        println!(
+            "Logger: {:?} {:?} with data {:?}",
+            request.method(),
+            request.route(),
+            data.peek()
+        );
+    }
+
+    //fn on_response(&self, request: &Request, response: &mut rocket::Response) {}
+}
+
 fn main() {
     rocket::ignite()
         .manage(Mutex::new(Memory::default()))
         .mount("/v1", routes![push, pull])
-        .register(catchers![bad_request_400, bad_request_404])
+        .attach(Logger::new())
         .launch();
 }
