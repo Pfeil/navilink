@@ -84,13 +84,6 @@ impl Fairing for Logger {
 
     fn on_request(&self, request: &mut Request, data: &rocket::Data) {
         println!("Logger: {:?}", request);
-        let mut data_content: Vec<u8> = Vec::new();
-        while !data.peek_complete() {
-            let peek = data.peek();
-            for byte in peek {
-                data_content.push(*byte);
-            }
-        }
         println!(
             "Logger: {:?} {:?} with data {:#?}",
             request.method(),
@@ -106,6 +99,6 @@ fn main() {
     rocket::ignite()
         .manage(Mutex::new(Memory::default()))
         .mount("/v1", routes![push, pull])
-        .attach(Logger::new())
+        //.attach(Logger::new())
         .launch();
 }
